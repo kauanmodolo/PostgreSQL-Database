@@ -31,6 +31,7 @@ SET SEARCH_PATH TO lojas, "$user", public;
 CREATE TABLE produtos (
                 produto_id NUMERIC(38) NOT NULL,
                 nome VARCHAR(255) NOT NULL,
+                -- Constraint para permitir apenas valores maiores ou igual a 0 na coluna preco_unitario.
                 preco_unitario NUMERIC(10,2) CHECK(preco_unitario >=0),
                 detalhes BYTEA,
                 imagem BYTEA,
@@ -64,6 +65,7 @@ CREATE TABLE lojas (
                 logo_arquivo VARCHAR(512),
                 logo_charset VARCHAR(512),
                 logo_ultima_atualizacao DATE,
+                -- Constraint para que pelo menos uma das colunas (endereco_web ou endereco_fisico) seja preenchida.
                 CONSTRAINT pelo_menos_uma CHECK (endereco_web IS NOT NULL OR endereco_fisico IS NOT NULL),
                 CONSTRAINT pk_lojas PRIMARY KEY (loja_id)
 );
@@ -85,6 +87,7 @@ CREATE TABLE estoques (
                 estoque_id NUMERIC(38) NOT NULL,
                 loja_id NUMERIC(38) NOT NULL,
                 produto_id NUMERIC(38) NOT NULL,
+                -- Constraint para o valor inserido na coluna quantidade ser maior ou igual a 0.
                 quantidade NUMERIC(38) NOT NULL CHECK(quantidade>=0),
                 CONSTRAINT pk_estoques PRIMARY KEY (estoque_id)
 );
@@ -97,6 +100,7 @@ COMMENT ON COLUMN estoques.quantidade IS 'Coluna com dados acerca da quantidade 
 -- Criar a tabela clientes:
 CREATE TABLE clientes (
                 cliente_id NUMERIC(38) NOT NULL,
+                -- Constraint para que tenha que inserir um @ no valor da coluna email. 
                 email VARCHAR(255) NOT NULL CHECK(email LIKE '%@%'),
                 nome VARCHAR(255) NOT NULL,
                 telefone1 VARCHAR(20),
@@ -118,6 +122,7 @@ CREATE TABLE envios (
                 loja_id NUMERIC(38) NOT NULL,
                 cliente_id NUMERIC(38) NOT NULL,
                 endereco_entrega VARCHAR(512) NOT NULL,
+                -- Constraint para permitir somente os valores citados abaixo na coluna check.
                 status VARCHAR(15) NOT NULL CHECK(status IN('CRIADO', 'ENVIADO', 'TRANSITO', 'ENTREGUE')),
                 CONSTRAINT pk_envios PRIMARY KEY (envio_id)
 );
@@ -133,6 +138,7 @@ CREATE TABLE pedidos (
                 pedido_id NUMERIC(38) NOT NULL,
                 data_hora TIMESTAMP NOT NULL,
                 cliente_id NUMERIC(38) NOT NULL,
+                -- Constraint para permitir somente os valores citados abaixo na coluna check.
                 status VARCHAR(15) NOT NULL CHECK (status IN('CANCELADO', 'COMPLETO', 'ABERTO', 'PAGO', 'REEMBOLSADO', 'ENVIADO')),
                 loja_id NUMERIC(38) NOT NULL,
                 CONSTRAINT pk_pedidos PRIMARY KEY (pedido_id)
@@ -149,6 +155,7 @@ CREATE TABLE pedidos_itens (
                 pedido_id NUMERIC(38) NOT NULL,
                 produto_id NUMERIC(38) NOT NULL,
                 numero_da_linha NUMERIC(38) NOT NULL,
+                -- Constraint para os valores inseridos nas colunas (preco_unitario e quantidade) seja maior ou igual a 0.
                 preco_unitario NUMERIC(10,2) NOT NULL CHECK(preco_unitario >=0),
                 quantidade NUMERIC(38) NOT NULL CHECK(quantidade >=0),
                 envio_id NUMERIC(38),
